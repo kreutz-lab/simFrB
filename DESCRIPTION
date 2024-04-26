@@ -24,3 +24,5 @@ Remotes:
     kreutz-lab/DIMAR
 Depends: 
     R (>= 2.10)
+URL: https://github.com/mengerj/simulationFromBenchmark
+BugReports: https://github.com/mengerj/simulationFromBenchmark/issues
