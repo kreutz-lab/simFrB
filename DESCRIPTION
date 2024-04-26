@@ -14,5 +14,13 @@ Config/testthat/edition: 3
 Imports: 
     assertthat,
     biglm,
+    DIMAR,
+    dplyr,
+    magrittr,
     mlr3misc,
-    stats
+    stats,
+    utils
+Remotes:
+    kreutz-lab/DIMAR
+Depends: 
+    R (>= 2.10)
