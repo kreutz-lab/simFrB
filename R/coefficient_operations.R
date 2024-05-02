@@ -225,7 +225,7 @@ fitLmModel <- function(mtx, chunksize, predictors) {
   # Get chunks indices to apply linear model chunk by chunk
   chunks <- ceiling(seq(0, nrow(mtx),
                         length.out = ceiling(nrow(mtx) / chunksize)))
-  if (length(chunks == 1))
+  if (length(chunks) == 1)
     chunks <- c(0, nrow(mtx))
   for (n in 1:(length(chunks) - 1)) {
     idx1 <- chunks[n] + 1
