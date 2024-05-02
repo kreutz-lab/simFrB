@@ -43,16 +43,17 @@
 #' loadDataFromGit(url)
 #' exp.df <- subsetDIAWorkflowData(data = data, DIAWorkflow = "DIANN_DIANN_AI",
 #' experimentalComparisonGroups = c("1-12","1-25"),
-#' rowSubset = seq(1,200), colSubset = c(seq(1,6),seq(24,29)))
+#' rowSubset = seq(1,500), colSubset = c(seq(1,6),seq(24,29)))
 #'
 #' exp.df <- exp.df[rowSums(exp.df, na.rm = TRUE) > 0, ]
 #' DE_idx <- grep("ECOLI", rownames(exp.df))
 #'   sim_data <- msb.simulateDataFromBenchmark(
 #'    mtx = as.matrix(exp.df),
 #'    DE_idx = DE_idx,
-#'    nFeatures = 200,
-#'    nSamples = 10)
+#'    nFeatures = 8000,
+#'    nSamples = 46)
 #' }
+#'
 #'
 #' @importFrom DIMAR dimarLearnPattern dimarAssignPattern
 #' @export
@@ -102,14 +103,15 @@ msb.simulateDataFromBenchmark <- function(mtx = NULL,
                           msg = "currently groupDesign can only handle two
                           groups, labelled with integers 1 and 2")
 
-  assertthat::assert_that(length(groupDesign_new) == nSamples,
-                          msg = "groupDesign_new needs to have one entry for each
-                          sample, specifing the group assigment of that sample")
+
 
   DEidxAssertions(DE_idx, mtx)
 
   assertthat::assert_that(nSamples %% 2 == 0,
                           msg = "nSamples needs to be an even number")
+  assertthat::assert_that(length(groupDesign_new) == nSamples,
+                          msg = "groupDesign_new needs to have one entry for each
+                          sample, specifing the group assigment of that sample")
 
   assertthat::assert_that(nFeatures > 0,
                           msg = "nFeatures needs to be a positive number")
@@ -143,14 +145,10 @@ msb.simulateDataFromBenchmark <- function(mtx = NULL,
                                      DE_idx = newCoefs$newDE_idx,
                                      int.mean = int.mean)
   #Use drawn logit coefficients to include missing values
-  sim <- DIMAR::dimarAssignPattern(ref = full.mtx,
-                                   coef = newCoefs$newDimarCoefs,
-                                   mtx = mtx)
-  npat <- dim(sim)[3]
-  sim <- array(sim,c(dim(full.mtx),npat), dimnames = list(rownames(full.mtx),
-                                                          colnames(full.mtx),
-                                                          1:npat))
-  sim.df <- as.data.frame(sim[,,sample(1:npat,1)])
+  sim.df <- dimarAssignInChunks(ref = full.mtx,
+                                coef = newCoefs$newDimarCoefs,
+                                npat = 1)
+
 
   attr(sim.df,"usedCoefs") <- newCoefs
   attr(sim.df,"expCoefs") <- jointCoefs
@@ -298,3 +296,75 @@ mtxSimulate <- function(nFeatures, nSamples, coefs, int.mean, groupDesign,
   return(full.mtx)
 }
 
+#' Assign DIMAR Coefficients in Chunks
+#'
+#' This function applies DIMAR coefficients to a reference matrix (`ref`) in chunks,
+#' optionally using an existing matrix (`mtx`) for additional computations. It is designed
+#' for large datasets where applying coefficients in chunks helps manage memory usage.
+#' The function processes data by group as defined in the coefficients.
+#'
+#' @param ref A matrix or data frame used as the reference for assigning coefficients.
+#' @param coef A named vector of coefficients including both row and other coefficients.
+#'             Row coefficients should have names marked with "#" to denote groups.
+#' @param chunksize The number of rows to process per chunk; defaults to the minimum of
+#'                  400 or the number of rows in `ref`.
+#' @param npat The number of patterns to simulate, defaults to 1.
+#'
+#' @return A data frame combining all chunks with the DIMAR pattern assignment applied.
+#'         Each row in the returned data frame corresponds to a row in the `ref` matrix,
+#'         with additional dimensions if `npat` > 1.
+#'
+#' @details The function segregates coefficients into groups based on their names, applies
+#'          these coefficients to chunks of the reference matrix. It outputs a single data frame
+#'          that aggregates the results from all chunks.
+#' @noRd
+dimarAssignInChunks <- function(ref,
+                                coef,
+                                chunksize = min(nrow(ref), 400),
+                                npat = 1){
+
+  dimarRow_idx <- which(attributes(coef)$xtype == 3)
+  rowCoefs <- coef[dimarRow_idx]
+  otherCoefs <- coef[-dimarRow_idx]
+
+  #seperate rowCoefs by group
+  rowCoefs.lst <- list()
+  rowGroupVector <- gsub(".*#", "", names(rowCoefs))
+  for (g in unique(rowGroupVector)) {
+    rowCoefs.group <- rowCoefs[rowGroupVector == g]
+    rowCoefs.lst[[paste0("dimarCoefs_group",g)]] <- rowCoefs.group
+  }
+  # Get chunks indices to apply linear model chunk by chunk
+  chunks <- ceiling(seq(0, nrow(ref),
+                        length.out = ceiling(nrow(ref) / chunksize)))
+  if (length(chunks) == 1){
+    chunks <- c(0, nrow(ref))}
+
+  sim.chunk.df <- list()
+
+  for (n in 1:(length(chunks) - 1)) {
+    idx1 <- chunks[n] + 1
+    idx2 <- chunks[n + 1]
+    message(paste("applying dimar coefficients from", idx1, "to", idx2))
+    ref.chunk <- ref[idx1:idx2, ]
+    rowCoefs.chunk <- c()
+    for (g in unique(rowGroupVector)) {
+      rowCoefs.chunk.group <- rowCoefs.lst[[paste0("dimarCoefs_group",g)]]
+      rowCoefs.chunk <- c(rowCoefs.chunk, rowCoefs.chunk.group[idx1:idx2])
+    }
+    coefs.chunk <- c(otherCoefs, rowCoefs.chunk)
+
+
+    sim.chunk <- suppressMessages(DIMAR::dimarAssignPattern(ref = ref.chunk,
+                                           coef = coefs.chunk,
+                                           npat = npat))
+
+    sim.chunk <- array(sim.chunk,c(dim(ref.chunk),npat), dimnames = list(rownames(ref.chunk),
+                                                                         colnames(ref.chunk),
+                                                                         1:npat))
+
+    sim.chunk.df[[n]] <- as.data.frame(sim.chunk[,,sample(1:npat,1)])
+  }
+  sim.df <- do.call(rbind, sim.chunk.df)
+  return(sim.df)
+}

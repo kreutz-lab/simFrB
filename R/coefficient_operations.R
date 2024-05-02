@@ -357,6 +357,7 @@ joinRowCoefs <- function(lmCoefs, dimarCoefs, nSamples) {
   }
   jointRowCoefs$ifDE[DE_idx] <- "DE"
 
+  attr(jointRowCoefs, "dimarXtype") <- attributes(dimarCoefs)$xtype
   return(jointRowCoefs)
 
 }
@@ -395,8 +396,10 @@ drawCoefs <- function(jointCoefficients,
                                            newRowCoefs$rowIDs))
 
   ## combine dimar coefs
-  newDimarCoefs <- combineNewDimarCoefs(jointCoefficients, newRowCoefs, newColCoefs, nGroups = length(newRowCoefs) - 5)
-
+  nGroups <- length(newRowCoefs) - 5
+  newDimarCoefs <- combineNewDimarCoefs(jointCoefficients, newRowCoefs, newColCoefs, nGroups = nGroups)
+  newXtype <- c(0,1,rep(2,nSamples),rep(3,nFeatures*nGroups))
+  attr(newDimarCoefs, "xtype") <- newXtype
 
   # Return final results
   return(list(newLmCoefs = newLmCoefs, newDimarCoefs = newDimarCoefs, newDE_idx = rowResults$newDE_idx))
@@ -437,8 +440,8 @@ combineNewDimarCoefs <- function(jointCoefficients, newRowCoefs, newColCoefs, nG
     dimarCoefs.group <- newRowCoefs[,ncol(newRowCoefs) - (g - 1)]
     names(dimarCoefs.group) <- newRowCoefs$rowIDs
     groupDE_idx <- which(newRowCoefs$ifDE == "DE")
-    names(dimarCoefs.group)[groupDE_idx] <-
-      paste0(names(dimarCoefs.group)[groupDE_idx],"_","DE")
+    #names(dimarCoefs.group)[groupDE_idx] <-
+    #  paste0(names(dimarCoefs.group)[groupDE_idx],"_","DE")
     names(dimarCoefs.group) <- paste0(names(dimarCoefs.group),"#",g)
     newDimarCoefs <- c(newDimarCoefs, dimarCoefs.group)
   }
