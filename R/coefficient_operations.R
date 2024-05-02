@@ -236,12 +236,12 @@ fitLmModel <- function(mtx, chunksize, predictors) {
 
     #The design can only include FC coefficient if DE proteins present in chunk
     if (2 %in% data.chunk$FC)
-      design <- stats::as.formula(intensity ~ rowID + colID + rowID:FC - 1)
+      dsgn <- stats::as.formula(intensity ~ rowID + colID + rowID:FC - 1)
     else
-      design <- stats::as.formula(intensity ~ rowID + colID - 1)
+      dsgn <- stats::as.formula(intensity ~ rowID + colID - 1)
 
     if (n == 1) {
-      fit <- biglm::biglm(design, data.chunk)
+      fit <- do.call(speedglm::speedlm,list(formula = dsgn, data = data.chunk))
     } else {
       fit <- stats::update(fit, moredata = data.chunk)
     }

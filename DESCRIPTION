@@ -18,6 +18,7 @@ Imports:
     dplyr,
     magrittr,
     mlr3misc,
+    speedglm,
     stats,
     utils
 Remotes:
