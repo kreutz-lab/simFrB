@@ -18,8 +18,10 @@ Imports:
     dplyr,
     magrittr,
     mlr3misc,
+    reshape2,
     speedglm,
     stats,
+    tidyr,
     utils
 Remotes:
     kreutz-lab/DIMAR
