@@ -259,8 +259,6 @@ fitLmModel <- function(mtx, chunksize, predictors) {
 #' @return A list of structured coefficients.
 #' @noRd
 aggregateLmCoefs <- function(coefs, DE_idx){
-print(coefs)
-print(DE_idx)
   lmCoefs <- list(
     featureCoefs =
       coefs[grepl("rowID", names(coefs)) &
@@ -354,8 +352,15 @@ joinRowCoefs <- function(lmCoefs, dimarCoefs, nSamples) {
                                  to = length(dimarCoefs))]
 
   rowGroupVector <- gsub(".*#", "", names(dimarRowCoef))
+  print(rowGroupVector)
+
   for (g in unique(rowGroupVector)) {
     dimarRowCoef.group <- dimarRowCoef[rowGroupVector == g]
+    print("dimarRowCoef.group")
+    print(dimarRowCoef.group)
+    print("jointRowCoefs")
+    print(jointRowCoefs)
+    print(dim(jointRowCoefs))
     assertthat::assert_that(length(dimarRowCoef.group) == length(jointRowCoefs$rowIDs),
                             msg = "number of row coefficients from dimar and lm do not match")
     jointRowCoefs[[paste0("dimarCoefs_group",g)]] <- dimarRowCoef.group
