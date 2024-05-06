@@ -270,9 +270,9 @@ aggregateLmCoefs <- function(coefs, DE_idx){
   )
   # set NA coefficients to 0
   lmCoefs$FCCoefs[is.na(lmCoefs$FCCoefs)] <- 0
-#  names(lmCoefs$FCCoefs) <- gsub(":FC2","",names(lmCoefs$FCCoefs))
+  names(lmCoefs$FCCoefs) <- gsub(":FC2","",names(lmCoefs$FCCoefs))
   #add DE_idx to names
- # names(lmCoefs$FCCoefs)[DE_idx] <- paste0(names(lmCoefs$FCCoefs)[DE_idx],"_DE")
+  names(lmCoefs$FCCoefs)[DE_idx] <- paste0(names(lmCoefs$FCCoefs)[DE_idx],"_DE")
   names(lmCoefs$featureCoefs)[DE_idx] <- paste0(names(lmCoefs$featureCoefs)[DE_idx],"_DE")
   return(lmCoefs)
 }
@@ -338,9 +338,10 @@ joinRowCoefs <- function(lmCoefs, dimarCoefs, nSamples) {
   FCCoefs.df <- data.frame(rowIDs = names(lmCoefs$FCCoefs),
                            FCCoefs = lmCoefs$FCCoefs, row.names = NULL)
   FCCoefs.df$rowIDs <- sub(":FC*[0-9]","",FCCoefs.df$rowIDs)
+
+  assertthat::are_equal(FCCoefs.df$rowIDs, jointRowCoefs$rowIDs,
+                       msg = "rowIDs from lmCoefs and FCCoefs do not match!")
   jointRowCoefs <- dplyr::inner_join(jointRowCoefs, FCCoefs.df)
-  #set NA values to 0 to enable adding to feature coefs
-  #jointRowCoefs$FCCoefs[is.na(jointRowCoefs$FCCoefs)] <- 0
 
   DE_idx_dimar <- attributes(dimarCoefs)$DE_idx
   DE_idx <- grep("DE",names(lmCoefs$FCCoefs))
@@ -352,15 +353,9 @@ joinRowCoefs <- function(lmCoefs, dimarCoefs, nSamples) {
                                  to = length(dimarCoefs))]
 
   rowGroupVector <- gsub(".*#", "", names(dimarRowCoef))
-  print(rowGroupVector)
 
   for (g in unique(rowGroupVector)) {
     dimarRowCoef.group <- dimarRowCoef[rowGroupVector == g]
-    print("dimarRowCoef.group")
-    print(dimarRowCoef.group)
-    print("jointRowCoefs")
-    print(jointRowCoefs)
-    print(dim(jointRowCoefs))
     assertthat::assert_that(length(dimarRowCoef.group) == length(jointRowCoefs$rowIDs),
                             msg = "number of row coefficients from dimar and lm do not match")
     jointRowCoefs[[paste0("dimarCoefs_group",g)]] <- dimarRowCoef.group

@@ -190,14 +190,7 @@ estimateAndJoinCoefficients <- function(mtx, DE_idx, groupDesign_mtx){
   #experimental data
   dimarCoefs <- DIMAR::dimarLearnPattern(mtx = mtx, DE_idx = DE_idx,
                                   orderCoefByName = T)
-  print("these are dimar coefs:")
-  print(dimarCoefs)
-print("matrix dim")
-  print(dim(mtx))
-print("length dimarCoefs")
-print(length(dimarCoefs))
-print("length lmCoefs rows")
-print(length(lmCoefs$featureCoefs))
+
   #Create a joint dataframe matching coefficients obtained for intensity values
   #and missing values. One data frame for row coefficients with DE label, one
   #for column coefficients
