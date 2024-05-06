@@ -66,3 +66,24 @@ test_that("makePredictors outputs correct predictors", {
   #FC predictors for proteins not DE should always be 1
   expect_true(all(predictors$FC[!predictors$rowIDs %in% DE_idx] == 1))
 })
+
+test_that("msb.omicsGetLmCoefs runs as expected chunk does not contain any DE", {
+  # Create a small example matrix
+  nFeatures = 250
+  nSamples = 10
+  mtx <- matrix(rnorm(20), nrow = nFeatures, ncol = nSamples)
+  DE_idx <- sample(1:100,20)
+
+  # Define group design
+  groupDesign <- c(rep(1, 5), rep(2, 5))  # Simple group design for illustration
+
+  # Call the function
+  lmCoefs <- msb.omicsGetLmCoefs(mtx, DE_idx = DE_idx, groupDesign, chunksize = 100)
+
+  expect_length(lmCoefs, 4)  # Expect 4 elements in the output list
+  expect_length(lmCoefs$featureCoefs, nFeatures)
+  expect_length(lmCoefs$sampleCoefs, nSamples)
+  expect_length(lmCoefs$FCCoefs, nFeatures)
+  expect_length(lmCoefs$featureSd, nFeatures)
+
+})

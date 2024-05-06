@@ -43,15 +43,15 @@
 #' loadDataFromGit(url)
 #' exp.df <- subsetDIAWorkflowData(data = data, DIAWorkflow = "DIANN_DIANN_AI",
 #' experimentalComparisonGroups = c("1-12","1-25"),
-#' rowSubset = seq(1,500), colSubset = c(seq(1,6),seq(24,29)))
+#' rowSubset = seq(1,900), colSubset = c(seq(1,5),seq(24,28)))
 #'
 #' exp.df <- exp.df[rowSums(exp.df, na.rm = TRUE) > 0, ]
 #' DE_idx <- grep("ECOLI", rownames(exp.df))
 #'   sim_data <- msb.simulateDataFromBenchmark(
 #'    mtx = as.matrix(exp.df),
 #'    DE_idx = DE_idx,
-#'    nFeatures = 8000,
-#'    nSamples = 46)
+#'    nFeatures = 800,
+#'    nSamples = 20)
 #' }
 #'
 #'

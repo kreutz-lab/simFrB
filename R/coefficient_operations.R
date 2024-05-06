@@ -43,8 +43,12 @@ msb.omicsGetLmCoefs <- function(mtx = NULL, DE_idx = NULL,
 
   #run fits chunk by chunk
   fit <- fitLmModel(mtx = mtx, chunksize = chunksize, predictors = predictors)
+  coefs <- stats::coef(fit)
 
-  coefs <- aggregateLmCoefs(coefs = stats::coef(fit), DE_idx = DE_idx)
+  assertthat::assert_that(length(coefs) == (nrow(predictors$rowIDs.mtx) + ncol(predictors$colIDs.mtx) + nrow(predictors$FC.mtx)- 1),
+                        msg = "number of coefficients does not match number of predictors")
+
+  coefs <- aggregateLmCoefs(coefs = coefs, DE_idx = DE_idx)
 
   lmCoefs <- addSdToCoefs(mtx = mtx,
                           coefs = coefs,
@@ -234,17 +238,14 @@ fitLmModel <- function(mtx, chunksize, predictors) {
 
     data.chunk <- prepareDataChunk(mtx, idx1, idx2, predictors)
 
-    #The design can only include FC coefficient if DE proteins present in chunk
-    if (2 %in% data.chunk$FC)
-      dsgn <- stats::as.formula(intensity ~ rowID + colID + rowID:FC - 1)
-    else
-      dsgn <- stats::as.formula(intensity ~ rowID + colID - 1)
-
     if (n == 1) {
-      fit <- do.call(speedglm::speedlm,list(formula = dsgn, data = data.chunk))
+      fit <- biglm::biglm(
+        formula = stats::formula(intensity ~ rowID + colID + rowID:FC - 1),
+        data = data.chunk)
     } else {
       fit <- stats::update(fit, moredata = data.chunk)
     }
+
   }
   return(fit)
 }
@@ -273,7 +274,6 @@ aggregateLmCoefs <- function(coefs, DE_idx){
   #add DE_idx to names
   names(lmCoefs$FCCoefs)[DE_idx] <- paste0(names(lmCoefs$FCCoefs)[DE_idx],"_DE")
   names(lmCoefs$featureCoefs)[DE_idx] <- paste0(names(lmCoefs$featureCoefs)[DE_idx],"_DE")
-
   return(lmCoefs)
 }
 

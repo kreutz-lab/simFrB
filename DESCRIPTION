@@ -13,11 +13,11 @@ Suggests:
 Config/testthat/edition: 3
 Imports: 
     assertthat,
+    biglm,
     DIMAR,
     dplyr,
     magrittr,
     mlr3misc,
-    speedglm,
     stats,
     utils
 Remotes:
