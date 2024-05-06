@@ -325,6 +325,7 @@ joinCoefs <- function(lmCoefs,
 #' @return Data frame of combined row coefficients.
 #' @noRd
 joinRowCoefs <- function(lmCoefs, dimarCoefs, nSamples) {
+
   #initialise data frame
   jointRowCoefs <- data.frame(rowIDs = names(lmCoefs$featureCoefs),
                               lmCoefs = lmCoefs$featureCoefs,
@@ -355,6 +356,8 @@ joinRowCoefs <- function(lmCoefs, dimarCoefs, nSamples) {
   rowGroupVector <- gsub(".*#", "", names(dimarRowCoef))
   for (g in unique(rowGroupVector)) {
     dimarRowCoef.group <- dimarRowCoef[rowGroupVector == g]
+    assertthat::assert_that(length(dimarRowCoef.group) == length(jointRowCoefs$rowIDs),
+                            msg = "number of row coefficients from dimar and lm do not match")
     jointRowCoefs[[paste0("dimarCoefs_group",g)]] <- dimarRowCoef.group
   }
   jointRowCoefs$ifDE[DE_idx] <- "DE"

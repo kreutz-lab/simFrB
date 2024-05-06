@@ -87,3 +87,20 @@ test_that("msb.omicsGetLmCoefs runs as expected chunk does not contain any DE", 
   expect_length(lmCoefs$featureSd, nFeatures)
 
 })
+
+test_that("dimar coefs are estimated",{
+
+  nFeatures = 250
+  nSamples = 10
+  mtx <- matrix(rnorm(20), nrow = nFeatures, ncol = nSamples, dimnames = list(paste0("row",1:nFeatures),paste0("col",1:nSamples)))
+  DE_idx <- sample(1:250,50)
+
+  #Estimate Logit Coefficients (DIMAR) for chance of missing value from
+  #experimental data
+  dimarCoefs <- DIMAR::dimarLearnPattern(mtx = mtx, DE_idx = DE_idx,
+                                         orderCoefByName = T)
+  expect_length(dimarCoefs, nFeatures*2 + nSamples + 2)
+
+})
+
+
