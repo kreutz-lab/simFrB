@@ -258,6 +258,8 @@ fitLmModel <- function(mtx, chunksize, predictors) {
 #' @return A list of structured coefficients.
 #' @noRd
 aggregateLmCoefs <- function(coefs, DE_idx){
+print(coefs)
+print(DE_idx)
   lmCoefs <- list(
     featureCoefs =
       coefs[grepl("rowID", names(coefs)) &
@@ -269,9 +271,9 @@ aggregateLmCoefs <- function(coefs, DE_idx){
   )
   # set NA coefficients to 0
   lmCoefs$FCCoefs[is.na(lmCoefs$FCCoefs)] <- 0
-  names(lmCoefs$FCCoefs) <- gsub(":FC2","",names(lmCoefs$FCCoefs))
+#  names(lmCoefs$FCCoefs) <- gsub(":FC2","",names(lmCoefs$FCCoefs))
   #add DE_idx to names
-  names(lmCoefs$FCCoefs)[DE_idx] <- paste0(names(lmCoefs$FCCoefs)[DE_idx],"_DE")
+ # names(lmCoefs$FCCoefs)[DE_idx] <- paste0(names(lmCoefs$FCCoefs)[DE_idx],"_DE")
   names(lmCoefs$featureCoefs)[DE_idx] <- paste0(names(lmCoefs$featureCoefs)[DE_idx],"_DE")
 
   return(lmCoefs)
