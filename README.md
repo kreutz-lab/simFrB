@@ -38,11 +38,10 @@ the experimental data.
 For now this package can be installed from this github repository
 
 ``` r
-library(devtools)
-#> Lade nötiges Paket: usethis
-devtools::install_github("kreutz-lab/simFrB")
+library(remotes)
+remotes::install_github("kreutz-lab/simFrB")
 #> Using GitHub PAT from the git credential store.
-#> Skipping install of 'simulationFromBenchmark' from a github remote, the SHA1 (8dcf6d81) has not changed since last install.
+#> Skipping install of 'simulationFromBenchmark' from a github remote, the SHA1 (d7b958c5) has not changed since last install.
 #>   Use `force = TRUE` to force installation
 ```
 

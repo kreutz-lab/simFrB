@@ -30,8 +30,8 @@ This divergence was found to be caused by **feature dependent correlations of th
 For now this package can be installed from this github repository
 
 ```{r}
-library(devtools)
-devtools::install_github("kreutz-lab/simFrB")
+library(remotes)
+remotes::install_github("kreutz-lab/simFrB")
 ```
 
 Generally there or two modes of operation:
