@@ -30,7 +30,7 @@ This divergence was found to be caused by **feature dependent correlations of th
 For now this package can be installed from this github repository
 
 ```{r}
-library(remotes)
+library(remotes, quietly = T)
 remotes::install_github("kreutz-lab/simFrB")
 ```
 
@@ -39,10 +39,49 @@ Generally there or two modes of operation:
 1.  Use Available Data to estimate coefficients from. This will be most accurate for Benchmark data with known ground truth.
 
 ```{r}
-#exp.data <- load("pathToExpData")
-#DE_idx <- grep("DE",rownames(exp.data)) #This needs to be adapted depending on how you know which feature is differentially expressed
+library(simFrB)
+#load Experimental Data
+exp.df.all <-
+  simFrB::loadDataFromGit(
+    "https://raw.githubusercontent.com/kreutz-lab/dia-benchmarking/main/data/diaWorkflowResults_allDilutions.rds")
 
+exp.df <- simFrB::subsetDIAWorkflowData(
+  data = exp.df.all,
+  DIAWorkflow = "DIANN_DIANN_AI_GPF",
+  experimentalComparisonGroups = c("1-12","1-25"),
+  rowSubset = seq(1,500),
+  colSubset = c(seq(1,6),seq(24,29))
+)
 
+exp.df <- exp.df[rowSums(exp.df, na.rm = TRUE) > 0, ]
+exp.mtx <- as.matrix(exp.df)
+DE_idx <- grep("ECOLI",rownames(exp.df)) #This needs to be adapted depending on how you know which feature is differentially expressed
+
+sim <- simFrB::msb.applyFunctionWithSeed(simFrB::msb.simulateDataFromBenchmark,
+                                         seed = 123,
+                                         mtx = exp.mtx,
+                                      DE_idx = DE_idx,
+                                      int.mean = mean(exp.mtx,na.rm = T),
+                                      nFeatures = 1000,
+                                      nSamples = 10)
 ```
 
 1.  Use Pre calculated Coefficients stored in data/jointCoefs.rds
+
+```{r}
+load("data/jointCoefs.rda")
+
+sim <- simFrB::msb.simulateDataFromBenchmark(jointCoefs = jointCoefs,
+                                      nFeatures = 6000,
+                                      nSamples = 30)
+```
+
+The object returned by msb.simulateDataFromBenchmark contains the original coefficients, as well as the drawn coefficients that were used the simulate the given data as attributes.
+
+```{r}
+str(attributes(sim)$expCoefs)
+```
+
+```{r}
+str(attributes(sim)$usedCoefs)
+```

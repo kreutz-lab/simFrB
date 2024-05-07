@@ -341,7 +341,7 @@ joinRowCoefs <- function(lmCoefs, dimarCoefs, nSamples) {
 
   assertthat::are_equal(FCCoefs.df$rowIDs, jointRowCoefs$rowIDs,
                        msg = "rowIDs from lmCoefs and FCCoefs do not match!")
-  jointRowCoefs <- dplyr::inner_join(jointRowCoefs, FCCoefs.df)
+  jointRowCoefs <- dplyr::inner_join(jointRowCoefs, FCCoefs.df, by = "rowIDs")
 
   DE_idx_dimar <- attributes(dimarCoefs)$DE_idx
   DE_idx <- grep("DE",names(lmCoefs$FCCoefs))

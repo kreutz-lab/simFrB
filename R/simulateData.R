@@ -29,7 +29,7 @@
 #' @param int.mean The mean intensity value added to simulated data.
 #' @param drawReplace Logical indicating whether sampling of coefficients is with replacement.
 #'
-#' @return An array of simulated data with dimensions [nFeatures x nSamples x npat],
+#' @return An array of simulated data with dimensions nFeatures x nSamples x npat,
 #'         with attributes detailing the used coefficients.
 #'
 #' @details If `lmCoefs` or `dimarCoefs` are not provided, and an input matrix `mtx` is available,
@@ -66,7 +66,7 @@ msb.simulateDataFromBenchmark <- function(mtx = NULL,
                                           int.mean = 19,
                                           nFeatures = 2000,
                                           nSamples = 10,
-                                          nDE = 0.15 * nFeatures,
+                                          nDE = NULL,
                                           npat = 1,
                                           groupDesign_new = rep(c(1, 2), each = nSamples / 2),
                                           drawReplace = T) {
@@ -78,7 +78,7 @@ msb.simulateDataFromBenchmark <- function(mtx = NULL,
     if (is.null(jointCoefs))
       stop("Coefficients need to be provided if no matrix is given,
            Coefficients calculated from Froehlich et. al 2022 Benchmark Data
-           are available in data (pkg: simulationFromBenchmark).")
+           are available in data (pkg: simFrB).")
   } else {
     if (!"matrix" %in% class(mtx))
       mtx <- as.matrix(mtx)
@@ -114,6 +114,10 @@ msb.simulateDataFromBenchmark <- function(mtx = NULL,
   assertthat::assert_that(nFeatures > 0,
                           msg = "nFeatures needs to be a positive number")
 
+  if(is.null(nDE)){
+    nDE <- round(nFeatures * 0.15)
+    message("no nDE given, using default value of 15% of nFeatures")
+  }
   assertthat::assert_that(nDE > 0,
                           msg = "nDE needs to be a positive number")
 

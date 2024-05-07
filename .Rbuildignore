@@ -1,2 +1,4 @@
-^toyPackage\.Rproj$
+^renv$
+^renv\.lock$
+^simFrB\.Rproj$
 ^\.Rproj\.user$

@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(simulationFromBenchmark)
+library(simFrB)
 
-test_check("simulationFromBenchmark")
+test_check("simFrB")
