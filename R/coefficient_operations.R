@@ -442,7 +442,7 @@ combineNewDimarCoefs <- function(jointCoefficients, newRowCoefs, newColCoefs, nG
                               rownames(newColCoefs)))
   #loop over groups to add row coefficients
   for (g in 1:nGroups) {
-    dimarCoefs.group <- newRowCoefs[,ncol(newRowCoefs) - (g - 1)]
+    dimarCoefs.group <- newRowCoefs[,paste0("dimarCoefs_group",g)]
     names(dimarCoefs.group) <- newRowCoefs$rowIDs
     groupDE_idx <- which(newRowCoefs$ifDE == "DE")
     #names(dimarCoefs.group)[groupDE_idx] <-

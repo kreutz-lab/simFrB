@@ -22,13 +22,14 @@
 #' @param nFeatures Number of features to simulate in the output matrix.
 #' @param nSamples Number of samples to simulate in the output matrix.
 #' @param nDE Number of DE features, computed as a proportion of `nFeatures` by default.
+#' @param npat Number of patterns for missing value simulations, defaults to 1.
 #' @param groupDesign_mtx Group design for the input matrix `mtx` if it exists.
 #' @param groupDesign_new Group design for the new simulated matrix. By default
 #' first half of samples are assigned to group 1 and the second half to group 2.
 #' @param int.mean The mean intensity value added to simulated data.
 #' @param drawReplace Logical indicating whether sampling of coefficients is with replacement.
 #'
-#' @return A data frame representing a simulated dataset based on specified parameters
+#' @return An array of simulated data with dimensions [nFeatures x nSamples x npat],
 #'         with attributes detailing the used coefficients.
 #'
 #' @details If `lmCoefs` or `dimarCoefs` are not provided, and an input matrix `mtx` is available,
@@ -43,7 +44,7 @@
 #' loadDataFromGit(url)
 #' exp.df <- subsetDIAWorkflowData(data = data, DIAWorkflow = "DIANN_DIANN_AI",
 #' experimentalComparisonGroups = c("1-12","1-25"),
-#' rowSubset = seq(1,900), colSubset = c(seq(1,5),seq(24,28)))
+#' rowSubset = seq(1,1000), colSubset = c(seq(1,5),seq(24,28)))
 #'
 #' exp.df <- exp.df[rowSums(exp.df, na.rm = TRUE) > 0, ]
 #' DE_idx <- grep("ECOLI", rownames(exp.df))
@@ -51,7 +52,8 @@
 #'    mtx = as.matrix(exp.df),
 #'    DE_idx = DE_idx,
 #'    nFeatures = 800,
-#'    nSamples = 20)
+#'    nSamples = 20,
+#'    npat = 2)
 #' }
 #'
 #'
@@ -65,6 +67,7 @@ msb.simulateDataFromBenchmark <- function(mtx = NULL,
                                           nFeatures = 2000,
                                           nSamples = 10,
                                           nDE = 0.15 * nFeatures,
+                                          npat = 1,
                                           groupDesign_new = rep(c(1, 2), each = nSamples / 2),
                                           drawReplace = T) {
 
@@ -147,7 +150,7 @@ msb.simulateDataFromBenchmark <- function(mtx = NULL,
   #Use drawn logit coefficients to include missing values
   sim.df <- dimarAssignInChunks(ref = full.mtx,
                                 coef = newCoefs$newDimarCoefs,
-                                npat = 1)
+                                npat = npat)
 
 
   attr(sim.df,"usedCoefs") <- newCoefs
@@ -282,8 +285,8 @@ mtxSimulate <- function(nFeatures, nSamples, coefs, int.mean, groupDesign,
   #initialize matrix
   full.mtx <- matrix(data = NA, nrow = nFeatures, ncol = nSamples,
                      dimnames = list(rowNames, colNames))
-  for(rowID in 1:nFeatures) {
-    for(colID in 1:nSamples) {
+  for (rowID in 1:nFeatures) {
+    for (colID in 1:nSamples) {
       full.mtx[rowID,colID] <- coefs$featureCoefs[rowID] * rowScale +
         coefs$sampleCoefs[colID] * colScale + int.mean
       #for samples in group 2, add fold change
@@ -320,7 +323,7 @@ mtxSimulate <- function(nFeatures, nSamples, coefs, int.mean, groupDesign,
 #' @noRd
 dimarAssignInChunks <- function(ref,
                                 coef,
-                                chunksize = min(nrow(ref), 400),
+                                chunksize = min(nrow(ref), 300),
                                 npat = 1){
 
   dimarRow_idx <- which(attributes(coef)$xtype == 3)
@@ -340,7 +343,7 @@ dimarAssignInChunks <- function(ref,
   if (length(chunks) == 1){
     chunks <- c(0, nrow(ref))}
 
-  sim.chunk.df <- list()
+  sim <- list()
 
   for (n in 1:(length(chunks) - 1)) {
     idx1 <- chunks[n] + 1
@@ -363,8 +366,8 @@ dimarAssignInChunks <- function(ref,
                                                                          colnames(ref.chunk),
                                                                          1:npat))
 
-    sim.chunk.df[[n]] <- as.data.frame(sim.chunk[,,sample(1:npat,1)])
+    sim[[n]] <- sim.chunk
   }
-  sim.df <- do.call(rbind, sim.chunk.df)
-  return(sim.df)
+  sim.array <- abind::abind(sim, along = 1)
+  return(sim.chunk)
 }

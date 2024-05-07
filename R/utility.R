@@ -21,13 +21,10 @@
 #' @export
 
 msb.applyFunctionWithSeed <- function(functionName, seed = 123,  ...){
-  oldseed <- .Random.seed
 
-  #oldseed <- .Random.seed
   oldseed <- mlr3misc::get_seed()
 
   if (is.null(seed)) {
-    # seed <- .Random.seed
     seed <- mlr3misc::get_seed()
   }
 

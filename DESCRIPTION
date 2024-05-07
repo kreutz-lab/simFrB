@@ -2,7 +2,7 @@ Package: simulationFromBenchmark
 Title: Realistic Simulation Learned With Benchmark Data
 Version: 0.0.0.9000
 Authors@R: 
-    person("Jonatan", "Menger", , "jane@example.com", role = c("aut", "cre"))
+    person("Jonatan", "Menger", , "jonatan.menger@uniklinik-freiburg.de", role = c("aut", "cre"))
 Description: The package enables to simulate realistic count data based on benchmark datasets.
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -12,6 +12,7 @@ Suggests:
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Imports: 
+    abind,
     assertthat,
     biglm,
     DIMAR,
