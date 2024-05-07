@@ -41,8 +41,23 @@ For now this package can be installed from this github repository
 library(remotes, quietly = T)
 remotes::install_github("kreutz-lab/simFrB")
 #> Using GitHub PAT from the git credential store.
-#> Skipping install of 'simFrB' from a github remote, the SHA1 (b5c3eaa4) has not changed since last install.
-#>   Use `force = TRUE` to force installation
+#> Downloading GitHub repo kreutz-lab/simFrB@HEAD
+#> Warning in untar2(tarfile, files, list, exdir, restore_times): skipping pax
+#> global extended headers
+#> Warning in untar2(tarfile, files, list, exdir, restore_times): skipping pax
+#> global extended headers
+#> 
+#> ── R CMD build ─────────────────────────────────────────────────────────────────
+#>       ✔  checking for file 'C:\Users\mengerj\AppData\Local\Temp\RtmpicraMd\remotes9ec842a83188\kreutz-lab-simFrB-0f221f9/DESCRIPTION'
+#>       ─  preparing 'simFrB':
+#>    checking DESCRIPTION meta-information ...     checking DESCRIPTION meta-information ...   ✔  checking DESCRIPTION meta-information
+#>       ─  checking for LF line-endings in source and make files and shell scripts
+#>   ─  checking for empty or unneeded directories
+#>       ─  building 'simFrB_0.0.0.9000.tar.gz'
+#>      
+#> 
+#> Installiere Paket nach 'C:/Users/mengerj/AppData/Local/R/cache/R/renv/library/simFrB-61fc1892/R-4.3/x86_64-w64-mingw32'
+#> (da 'lib' nicht spezifiziert)
 ```
 
 Generally there or two modes of operation:
@@ -79,12 +94,12 @@ sim <- simFrB::msb.applyFunctionWithSeed(simFrB::msb.simulateDataFromBenchmark,
 #> No groupDesign for mtx provided, assuming first half of samples
 #>                 are in group 1 and second half in group 2. If this is not the case
 #>                 please provide groupDesign_mtx.
+#> no nDE given, using default value of 15% of nFeatures
 #> fitting from feature 1 to 454
 #> using input data to estimate feature standard deviations.
 #> By default DIMAR is assuming that the first half of the columns belong to group 1 and the second half to group 2.
 #>           If this is not the case, please provide the group vector to the dimarConstructDesignMatrix function.
 #> [1] "Pattern of MVs is learned by logistic regression."
-#> Joining with `by = join_by(rowIDs)`
 #> applying dimar coefficients from 1 to 334
 #> applying dimar coefficients from 335 to 667
 #> applying dimar coefficients from 668 to 1000
@@ -99,6 +114,7 @@ sim <- simFrB::msb.simulateDataFromBenchmark(jointCoefs = jointCoefs,
                                       nFeatures = 6000,
                                       nSamples = 30)
 #> No input matrix provided
+#> no nDE given, using default value of 15% of nFeatures
 #> applying dimar coefficients from 1 to 316
 #> applying dimar coefficients from 317 to 632
 #> applying dimar coefficients from 633 to 948
@@ -118,6 +134,45 @@ sim <- simFrB::msb.simulateDataFromBenchmark(jointCoefs = jointCoefs,
 #> applying dimar coefficients from 5054 to 5369
 #> applying dimar coefficients from 5370 to 5685
 #> applying dimar coefficients from 5686 to 6000
+```
+
+``` r
+head(sim[,,1])
+#>              group1_1 group1_2 group1_3 group1_4 group1_5 group1_6 group1_7
+#> feature_1    16.76577 17.36646 16.46576 17.67319 17.25391 17.30143       NA
+#> feature_2_DE 21.82664 20.83489 21.55430 20.82666 20.97709 21.01400 21.40457
+#> feature_3          NA 17.11768       NA 17.29566 15.11785 14.97760       NA
+#> feature_4    20.91279 20.32987 20.22190 20.61534 20.06344 20.44953 20.76403
+#> feature_5    15.67708 17.21497 16.74591 16.45736 16.61640 17.83990 17.89042
+#> feature_6    23.51221 22.35637 22.47397 22.89102 22.87916 22.54169 23.20558
+#>              group1_8 group1_9 group1_10 group1_11 group1_12 group1_13
+#> feature_1          NA 17.34063        NA        NA  16.83116        NA
+#> feature_2_DE 20.94151 20.86819  22.07049  21.31183  20.50197  20.66283
+#> feature_3    17.86083 16.09678  16.45548  15.90363  14.91542  17.14560
+#> feature_4    20.64517 20.43723  20.57914  20.72919  20.53584  20.68455
+#> feature_5    17.08755 14.06102  16.65025  16.80553  16.64296        NA
+#> feature_6    23.03450 23.16501  22.48665  22.28642  22.77655  22.72155
+#>              group1_14 group1_15 group2_16 group2_17 group2_18 group2_19
+#> feature_1           NA  15.83510  17.68981        NA  16.56912  17.68557
+#> feature_2_DE  20.68945  21.61390  20.16146  19.12283  19.71076  19.78356
+#> feature_3           NA        NA  14.97023  17.05489  14.34601  15.10124
+#> feature_4     20.31077  19.70984  20.18567  20.41315  20.43196  20.95875
+#> feature_5           NA        NA  16.42285  16.60812  15.26953  16.21896
+#> feature_6     22.12506  22.46405  22.88906  21.98919  22.09698  23.06340
+#>              group2_20 group2_21 group2_22 group2_23 group2_24 group2_25
+#> feature_1     16.72052  17.14894  17.06193  15.58739  17.69400  17.35400
+#> feature_2_DE  20.35814  20.98950  20.47576  19.49347  19.85025  18.87193
+#> feature_3     16.38673  17.18397  14.29873  18.07476  17.78277        NA
+#> feature_4     20.07099  20.33709  20.08741  20.56340  20.40731  20.68915
+#> feature_5           NA  17.32024  16.16152  16.30670        NA  17.61262
+#> feature_6     22.33384  22.54675  23.00266  22.37769  22.58796  23.24252
+#>              group2_26 group2_27 group2_28 group2_29 group2_30
+#> feature_1     17.56819  18.99654  17.46651  18.74488  17.63494
+#> feature_2_DE  19.02931  19.34307  19.04407  19.93392  20.79556
+#> feature_3     16.66164  15.96532        NA  15.78079  16.15334
+#> feature_4     21.08401  20.41823  20.51154  20.53918  21.14499
+#> feature_5     17.06050  16.17798  16.87317        NA  16.45592
+#> feature_6     22.58044  23.15755  21.90542  22.36117  23.14612
 ```
 
 The object returned by msb.simulateDataFromBenchmark contains the

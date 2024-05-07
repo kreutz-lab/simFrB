@@ -76,6 +76,10 @@ sim <- simFrB::msb.simulateDataFromBenchmark(jointCoefs = jointCoefs,
                                       nSamples = 30)
 ```
 
+```{r}
+head(sim[,,1])
+```
+
 The object returned by msb.simulateDataFromBenchmark contains the original coefficients, as well as the drawn coefficients that were used the simulate the given data as attributes.
 
 ```{r}
