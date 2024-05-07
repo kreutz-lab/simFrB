@@ -366,5 +366,5 @@ dimarAssignInChunks <- function(ref,
     sim[[n]] <- sim.chunk
   }
   sim.array <- abind::abind(sim, along = 1)
-  return(sim.chunk)
+  return(sim.array)
 }
