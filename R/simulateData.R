@@ -73,11 +73,6 @@ msb.simulateDataFromBenchmark <- function(mtx = NULL,
 
 
 
-  #check that DIMAR is installed
-  if (!requireNamespace("DIMAR", quietly = TRUE))
-    stop("DIMAR package is not installed.
-         Please install DIMAR package as shown in README.Rmd")
-
   if (is.null(mtx)) {
     message("No input matrix provided")
     if (is.null(jointCoefs))
@@ -122,6 +117,8 @@ msb.simulateDataFromBenchmark <- function(mtx = NULL,
   assertthat::assert_that(nDE > 0,
                           msg = "nDE needs to be a positive number")
 
+  assertthat::assert_that(is.numeric(int.mean) & length(int.mean) == 1,
+                          msg = "int.mean needs to be a numeric value")
 
 
 
