@@ -12,7 +12,7 @@ msb.simulateDataFromBenchmark(
   int.mean = 19,
   nFeatures = 2000,
   nSamples = 10,
-  nDE = 0.15 * nFeatures,
+  nDE = NULL,
   npat = 1,
   groupDesign_new = rep(c(1, 2), each = nSamples/2),
   drawReplace = T

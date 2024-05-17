@@ -151,6 +151,7 @@ msb.simulateDataFromBenchmark <- function(mtx = NULL,
   #Use drawn logit coefficients to include missing values
   sim.df <- dimarAssignInChunks(ref = full.mtx,
                                 coef = newCoefs$newDimarCoefs,
+                                groupDesign = groupDesign_new,
                                 npat = npat)
 
 
@@ -193,6 +194,7 @@ estimateAndJoinCoefficients <- function(mtx, DE_idx, groupDesign_mtx){
   #Estimate Logit Coefficients (DIMAR) for chance of missing value from
   #experimental data
   dimarCoefs <- DIMAR::dimarLearnPattern(mtx = mtx, DE_idx = DE_idx,
+                                         group = groupDesign_mtx,
                                   orderCoefByName = T)
 
   #Create a joint dataframe matching coefficients obtained for intensity values
@@ -325,6 +327,7 @@ mtxSimulate <- function(nFeatures, nSamples, coefs, int.mean, groupDesign,
 dimarAssignInChunks <- function(ref,
                                 coef,
                                 chunksize = min(nrow(ref), 300),
+                                groupDesign,
                                 npat = 1){
 
   dimarRow_idx <- which(attributes(coef)$xtype == 3)
@@ -361,6 +364,7 @@ dimarAssignInChunks <- function(ref,
 
     sim.chunk <- suppressMessages(DIMAR::dimarAssignPattern(ref = ref.chunk,
                                            coef = coefs.chunk,
+                                           group = groupDesign,
                                            npat = npat))
 
     sim.chunk <- array(sim.chunk,c(dim(ref.chunk),npat), dimnames = list(rownames(ref.chunk),
