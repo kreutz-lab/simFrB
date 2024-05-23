@@ -155,6 +155,7 @@ msb.simulateDataFromBenchmark <- function(mtx = NULL,
                                 npat = npat)
 
 
+  attr(sim.df, 'full') <- full.mtx
   attr(sim.df,"usedCoefs") <- newCoefs
   attr(sim.df,"expCoefs") <- jointCoefs
   return(sim.df)
