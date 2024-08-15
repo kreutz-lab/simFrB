@@ -21,9 +21,9 @@ Simulated omics data often serves as a basis to evaluate or create analysis tool
 
 One major challenge in simulating omics data is simulating missing value patterns. Simulations might take data dependencies into consideration by including values missing non at random, but we found that such approaches still fail to reproduce results observed in experimental data.
 
-While trying to validate results of statistical analysis tools used in Fröhlich et. al (), we observed a strong influence of the missing value pattern on statistical results if data was prepossessed with imputation, as done in the SAM method. While for experimental data, imputation strongly increased the pAUC of all statistical tests, it decreased the pAUC for simulated data.
+While trying to validate results of statistical analysis tools used in Fröhlich et. al (https://doi.org/10.1038/s41467-022-30094-0), we observed a strong influence of the missing value pattern on statistical results if data was prepossessed with imputation, as done in the SAM method. While for experimental data, imputation strongly increased the pAUC of all statistical tests, it decreased the pAUC for simulated data.
 
-This divergence was found to be caused by **feature dependent correlations of the missing value pattern**, that got lost in other simulation approaches. The implemented simulation tool leverages allows to leverage benchmark data in order to simulate new count matrices with realistic missing value patterns, by estimating coefficients for both intensity (linear model) and missingness (logit model) for each feature and drawing jointly to simulate data that keeps correlations found in the experimental data.
+This divergence was found to be caused by **feature dependent correlations of the missing value pattern**, that got lost in other simulation approaches. The implemented simulation tool leverages benchmark data in order to simulate new count matrices with realistic missing value patterns, by estimating coefficients for both intensity (linear model) and missingness (logit model) for each feature and drawing jointly to simulate data that keeps correlations found in the experimental data.
 
 ## Usage
 
@@ -36,7 +36,7 @@ remotes::install_github("kreutz-lab/simFrB")
 
 Generally there or two modes of operation:
 
-1.  Use Available Data to estimate coefficients from. This will be most accurate for Benchmark data with known ground truth.
+1.  Use Available Data to estimate coefficients from. This will be most accurate for Benchmark data with known ground truth. You could do this with other benchmarking data as a template.
 
 ```{r}
 library(simFrB)
@@ -63,10 +63,10 @@ sim <- simFrB::msb.applyFunctionWithSeed(simFrB::msb.simulateDataFromBenchmark,
                                       DE_idx = DE_idx,
                                       int.mean = mean(exp.mtx,na.rm = T),
                                       nFeatures = 1000,
-                                      nSamples = 10)
+                                      nSamples = 10)$res
 ```
 
-1.  Use Pre calculated Coefficients stored in data/jointCoefs.rds
+2.  Use Pre calculated Coefficients stored in data/jointCoefs.rds
 
 ```{r}
 load("data/jointCoefs.rda")
@@ -80,7 +80,7 @@ sim <- simFrB::msb.simulateDataFromBenchmark(jointCoefs = jointCoefs,
 head(sim[,,1])
 ```
 
-The object returned by msb.simulateDataFromBenchmark contains the original coefficients, as well as the drawn coefficients that were used the simulate the given data as attributes.
+The object returned by msb.simulateDataFromBenchmark is a three dimensional matrix, with the first dimension giving the features, the second the samples and the third are several random realizations of the missing value pattern. Furthermore it contains the original coefficients, as well as the drawn coefficients that were used the simulate the given data as attributes.
 
 ```{r}
 str(attributes(sim)$expCoefs)

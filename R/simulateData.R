@@ -22,7 +22,7 @@
 #' @param nFeatures Number of features to simulate in the output matrix.
 #' @param nSamples Number of samples to simulate in the output matrix.
 #' @param nDE Number of DE features, computed as a proportion of `nFeatures` by default.
-#' @param npat Number of patterns for missing value simulations, defaults to 1.
+#' @param npat Number of patterns for missing value simulations, defaults to 10.
 #' @param groupDesign_mtx Group design for the input matrix `mtx` if it exists.
 #' @param groupDesign_new Group design for the new simulated matrix. By default
 #' first half of samples are assigned to group 1 and the second half to group 2.
@@ -67,7 +67,7 @@ msb.simulateDataFromBenchmark <- function(mtx = NULL,
                                           nFeatures = 2000,
                                           nSamples = 10,
                                           nDE = NULL,
-                                          npat = 1,
+                                          npat = 10,
                                           groupDesign_new = rep(c(1, 2), each = nSamples / 2),
                                           drawReplace = T) {
 
