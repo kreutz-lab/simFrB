@@ -13,7 +13,7 @@ msb.simulateDataFromBenchmark(
   nFeatures = 2000,
   nSamples = 10,
   nDE = NULL,
-  npat = 1,
+  npat = 10,
   groupDesign_new = rep(c(1, 2), each = nSamples/2),
   drawReplace = T
 )
@@ -36,7 +36,7 @@ estimated from input mtx or found in data/.}
 
 \item{nDE}{Number of DE features, computed as a proportion of \code{nFeatures} by default.}
 
-\item{npat}{Number of patterns for missing value simulations, defaults to 1.}
+\item{npat}{Number of patterns for missing value simulations, defaults to 10.}
 
 \item{groupDesign_new}{Group design for the new simulated matrix. By default
 first half of samples are assigned to group 1 and the second half to group 2.}
